@@ -102,14 +102,14 @@ def get_response(llm, vectorstore, question):
     )
 
     qa = RetrievalQA.from_chain_type(
-        llm=llm,
-        chain_type="stuff",
-        retriever=vectorstore.as_retriever(
-            search_type="similarity", search_kwargs={"k": 5} # it will get 5 similar chunks
-        ),
-        return_source_documents=True,
-        chain_type_kwargs={"prompt": PROMPT}
-    )
+    llm=llm,
+    chain_type="stuff",
+    retriever=vectorstore.as_retriever(
+        search_type="similarity", search_kwargs={"k": 5} # it will get 5 similar chunks
+    ),
+    return_source_documents=True,
+    chain_type_kwargs={"prompt": PROMPT}
+)
     answer=qa({"query":question})
     return answer['result']
 
@@ -122,16 +122,7 @@ def load_index():
 
 ## Main function
 def main():
-    # Centered logo and header on top
-    st.markdown(
-        """
-        <div style="text-align: center;">
-            <img src="https://sudoconsultants.com/wp-content/uploads/2023/03/SUDO-Logo-Color.png" width="200" />
-            <h1 style="margin-top: 10px;">User site for query with PDF demo</h1>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.header("This is User site for chat with PDF demo using Bedrock")
 
     load_index()
 
@@ -162,4 +153,3 @@ def main():
 
 if __name__=="__main__":
     main()
-

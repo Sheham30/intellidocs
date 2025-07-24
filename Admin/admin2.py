@@ -3,6 +3,7 @@ import streamlit as st
 import os
 import uuid
 
+
 ## s3_client
 s3_client = boto3.client("s3")
 BUCKET_NAME = os.getenv("BUCKET_NAME")
@@ -21,6 +22,14 @@ from langchain_community.vectorstores import FAISS
 
 bedrock_client = boto3.client(service_name="bedrock-runtime")
 
+# bedrock_client = boto3.client(
+#     service_name="bedrock-runtime",
+#     region_name="us-east-1",
+#     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+#     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
+#     # aws_session_token=os.getenv("AWS_SESSION_TOKEN")  # If using temporary credentials
+# )
+
 bedrock_embeddings = BedrockEmbeddings(model_id="amazon.titan-embed-text-v1", client=bedrock_client)
 
 def get_unique_id():
@@ -30,13 +39,14 @@ def get_unique_id():
 def split_text(pages, chunk_size, chunk_overlap):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
     docs = text_splitter.split_documents(pages)
+
     return docs
 
 ## Create vector store
 def create_vector_store(request_id, documents):
-    vectorstore_faiss = FAISS.from_documents(documents, bedrock_embeddings)
-    file_name = f"{request_id}.bin"
-    folder_path = "/tmp/"
+    vectorstore_faiss=FAISS.from_documents(documents, bedrock_embeddings)
+    file_name=f"{request_id}.bin"
+    folder_path="/tmp/"
     vectorstore_faiss.save_local(index_name=file_name, folder_path=folder_path)
 
     ## upload to S3
@@ -45,21 +55,13 @@ def create_vector_store(request_id, documents):
 
     return True
 
+
 ## Main function
 def main():
-    # Centered logo and header
-    st.markdown(
-        """
-        <div style="text-align: center;">
-            <img src="https://sudoconsultants.com/wp-content/uploads/2023/03/SUDO-Logo-Color.png" width="200" />
-            <h1 style="margin-top: 10px;">Admin site for query with PDF demo</h1>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.header("Admin site for query with PDF demo")
 
     uploaded_file = st.file_uploader("Choose a file", "pdf")
-
+    
     if uploaded_file is not None:
         request_id = get_unique_id()
         st.write(f"Request Id: {request_id}")
@@ -85,9 +87,9 @@ def main():
 
         if result:
             st.write("Congratulations! PDF processed successfully")
+
         else: 
             st.write("Error! Please Check logs")
 
-if __name__ == "__main__":
+if __name__=="__main__":
     main()
-
